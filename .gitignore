@@ -1,0 +1,91 @@
+# Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.next
+release.properties
+dependency-reduced-pom.xml
+buildNumber.properties
+.mvn/timing.properties
+.mvn/wrapper/maven-wrapper.jar
+
+# Logs
+logs/
+*.log
+
+# IDE specific files
+.idea/
+*.iml
+*.ipr
+*.iws
+.classpath
+.project
+.settings/
+.vscode/
+*.launch
+.factorypath
+
+# OS specific files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# TestNG
+/test-output/
+/test-results/
+/testng-results.xml
+/test-output-*/
+/testng-failed.xml
+/testng-single.
+# Screenshots and reports
+/screenshots/
+/reports/
+/extent-reports/
+/extent-config.xml
+
+# Videos
+/videos
+
+
+# Environment variables
+.env
+*.properties
+*.env
+
+# Dependency directories
+node_modules/
+
+# Java class files
+*.class
+
+# Temporary files
+*.tmp
+*.bak
+*.swp
+*~.nib
+
+# Local development files
+*.orig
+
+# Package Files
+*.jar
+*.war
+*.nar
+*.ear
+*.zip
+*.tar.gz
+*.rar
+
+# virtual machine crash logs
+hs_err_pid*
+
+# Build directory
+build/
+
+# Maven wrapper
+.mvn/wrapper/
+
+# Log4j
+log4j2.xml
+log4j2-test.xml
