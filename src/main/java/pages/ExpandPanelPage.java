@@ -3,6 +3,7 @@ package pages;
 import com.aventstack.extentreports.ExtentTest;
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.AriaRole;
 import com.microsoft.playwright.options.LoadState;
 import com.microsoft.playwright.options.WaitForSelectorState;
 import com.microsoft.playwright.options.WaitUntilState;
@@ -51,32 +52,84 @@ public class ExpandPanelPage {
         test.info("Selected '" + domain + "' from domain dropdown");
     }
 
-    public void selectProject(String project, ExtentTest test) {
-        // Try clicking the input first, fallback to arrow if needed
+   public void selectProject(String project, ExtentTest test) {
         try {
-            page.click(PROJECT_DROPDOWN_INPUT);
-            test.info("Clicked project dropdown input");
+            // Wait for page stability
+            page.waitForLoadState(LoadState.NETWORKIDLE, 
+                new Page.WaitForLoadStateOptions().setTimeout(60000));
+            page.waitForTimeout(5000);
+            
+            // Try to wait for Telerik (but don't fail if it doesn't exist)
+            try {
+                page.waitForFunction(
+                    "() => window.Telerik && window.Telerik.Web && window.Telerik.Web.UI",
+                    new Page.WaitForFunctionOptions().setTimeout(10000)
+                );
+            } catch (Exception e) {
+                test.pass("Telerik check failed, proceeding anyway");
+            }
+            
+            boolean dropdownOpened = false;
+            
+            // Strategy 1: Click the combobox input (based on our earlier analysis)
+            try {
+                Locator comboboxInput = page.getByRole(AriaRole.COMBOBOX, 
+                    new Page.GetByRoleOptions().setName("Snapshot Project Selector"));
+                comboboxInput.click();
+                dropdownOpened = true;
+                test.info("Opened dropdown using combobox role");
+            } catch (Exception e) {
+                test.warning("Combobox role failed: " + e.getMessage());
+            }
+            
+            // Strategy 2: Click the input field directly
+            if (!dropdownOpened) {
+                try {
+                    page.locator(PROJECT_DROPDOWN_INPUT).click();
+                    dropdownOpened = true;
+                    test.info("Opened dropdown using input field");
+                } catch (Exception e) {
+                    test.warning("Input field click failed: " + e.getMessage());
+                }
+            }
+            
+            // Strategy 3: Click the dropdown arrow
+            if (!dropdownOpened) {
+                try {
+                    page.locator("#ctl00_Main_ProjectSnapShotDetails_ddlProjSnapShotSearchNum_Arrow").click();
+                    dropdownOpened = true;
+                    test.info("Opened dropdown using arrow");
+                } catch (Exception e) {
+                    test.warning("Arrow click failed: " + e.getMessage());
+                }
+            }
+            
+            if (!dropdownOpened) {
+                throw new RuntimeException("Failed to open project dropdown with all strategies");
+            }
+            
+            // Wait for dropdown to open
+            page.waitForTimeout(2000);
+            
+            // Select the project from the dropdown
+            try {
+                page.locator(PROJECT_LIST_ITEM)
+                    .filter(new Locator.FilterOptions().setHasText(project))
+                    .click();
+                test.info("Selected project: " + project);
+            } catch (Exception e) {
+                // Fallback: simple text search
+                page.getByText(project).click();
+                test.info("Selected project using text search: " + project);
+            }
+            
+            // Wait for selection to complete
+            page.waitForTimeout(2000);
+            
         } catch (Exception e) {
-            test.warning("Failed to click input, trying arrow: " + e.getMessage());
-            page.click(PROJECT_DROPDOWN_INPUT);
-            test.info("Clicked project dropdown arrow");
+            test.fail("Project selection failed: " + e.getMessage());
+            throw e;
         }
-        
-        // Wait for the dropdown items to be visible
-        page.waitForSelector(PROJECT_LIST_ITEM, new Page.WaitForSelectorOptions().setTimeout(60000).setState(WaitForSelectorState.VISIBLE));
-        Locator item = page.locator(PROJECT_LIST_ITEM, new Page.LocatorOptions().setHasText(project));
-        int count = item.count();
-        if (count == 0) {
-            test.fail("No project found with name: " + project);
-            throw new RuntimeException("No project found with name: " + project);
-        } else if (count > 1) {
-            test.warning("Multiple projects found with name: " + project + ". Clicking the first one.");
-        }
-        item.waitFor(new Locator.WaitForOptions().setTimeout(5000).setState(WaitForSelectorState.VISIBLE));
-        page.waitForTimeout(500);
-        item.first().click();
-        test.info("Selected project: " + project);
-        page.waitForTimeout(5000);
     }
     public void goToProjectDetails(ExtentTest test) {
         Locator goToDetails = page.locator(GO_TO_PROJECT_DETAILS_XPATH);
