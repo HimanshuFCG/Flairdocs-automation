@@ -50,8 +50,7 @@ desktop.ini
 
 # Environment variables
 .env
-*.properties
-*.env
+
 
 # Dependency directories
 node_modules/
