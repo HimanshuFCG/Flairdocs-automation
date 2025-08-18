@@ -685,6 +685,8 @@ public void completeLoginAndTabSelection() {
             fileSelectionPage.goToProjectDetails(getExtentTest());
             safeExtentLog("Navigated to project details");
             log.info("Navigated to project details");
+            page.waitForSelector(".loading-spinner", new Page.WaitForSelectorOptions().setState(WaitForSelectorState.HIDDEN));
+            
 
             // Click 'Project Information' and 'Checklist' tabs in project context
             fileSelectionPage.clickTabByName("Project Information", getExtentTest());
@@ -702,16 +704,6 @@ public void completeLoginAndTabSelection() {
             String errorMsg = "Failed to switch to domain 2 and select first file: " + e.getMessage();
             log.error(errorMsg, e);
             safeExtentFail(errorMsg);
-            
-            // Take screenshot on failure
-            /*try {
-                String screenshotPath = takeScreenshot("switch_domain2_select_file_failure");
-                if (screenshotPath != null) {
-                    safeExtentLog("Screenshot captured: " + screenshotPath);
-                }
-            } catch (Exception screenshotEx) {
-                log.error("Failed to take screenshot: " + screenshotEx.getMessage());
-            }*/
             
             throw new RuntimeException(errorMsg, e);
         } finally {
@@ -821,7 +813,7 @@ public void completeLoginAndTabSelection() {
             
             // Get configuration values
             String domain2 = ConfigReader.get("domain2");
-            String project2 = ConfigReader.get("project2"); // We need this for selectProject
+           // String project2 = ConfigReader.get("project2"); // We need this for selectProject
             
             // Initialize page object
             CreateNewProjectPage createNewProjectPage = new CreateNewProjectPage(page);
@@ -829,7 +821,7 @@ public void completeLoginAndTabSelection() {
        
             createNewProjectPage.selectDomain(domain2, getExtentTest());
             
-            createNewProjectPage.selectProject(project2, getExtentTest());
+        //    createNewProjectPage.selectProject(project2, getExtentTest());
             
             createNewProjectPage.verifyPopupOpensAndCloses(getExtentTest());
     

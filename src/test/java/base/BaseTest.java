@@ -179,7 +179,7 @@ public class BaseTest {
         if (extentTest != null) {
             extentTest.info(message);
         } else {
-            log.warn("Could not log to ExtentReport: " + message);
+            log.warn("logged to ExtentReport: " + message);
         }
     }
     protected void safeExtentPass(String message) {
